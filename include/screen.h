@@ -33,9 +33,11 @@ void set_pixel(int x, int y, Pixel p);
 
 void clear_scr();
 
-void set_clear_color(Color c);
+void set_clear_color(Color fore, Color back);
 
 int screen_delete();
+
+void update_screen();
 
 void printscr();
 

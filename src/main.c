@@ -56,28 +56,28 @@ void my_handler(char c) {
         posx = (posx > 0)?posx-1:posx;
         break;
     case KEY_0:
-        set_clear_color(PRETO);
+        set_clear_color(VERMELHO,PRETO);
         break;
     case KEY_1:
-        set_clear_color(VERMELHO);
+        set_clear_color(VERMELHO,VERMELHO);
         break;
     case KEY_2:
-        set_clear_color(VERDE);
+        set_clear_color(VERMELHO,VERDE);
         break;
     case KEY_3:
-        set_clear_color(AMARELO);
+        set_clear_color(VERMELHO,AMARELO);
         break;
     case KEY_4:
-        set_clear_color(AZUL);
+        set_clear_color(VERMELHO,AZUL);
         break;
     case KEY_5:
-        set_clear_color(MAGENTA);
+        set_clear_color(VERMELHO,MAGENTA);
         break;
     case KEY_6:
-        set_clear_color(CIANO);
+        set_clear_color(VERMELHO,CIANO);
         break;
     case KEY_7:
-        set_clear_color(BRANCO);
+        set_clear_color(VERMELHO,BRANCO);
         break;
     
     default:
@@ -103,6 +103,7 @@ int main() {
     while (running){
         usleep(100000);
         clear_scr();
+        update_screen();
         printscr();
     }
     

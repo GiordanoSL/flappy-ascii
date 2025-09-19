@@ -54,7 +54,7 @@ static void* keyboard_loop(void* arg) {
         }
 
         if (handler) handler(c);
-        usleep(100000);
+        usleep(16666);
     }
     return NULL;
 }

@@ -41,7 +41,10 @@ static int running = 0;
 
 static char * screen = NULL;
 
-static char clear_color[8];
+static Color clear_color_fore;
+static Color clear_color_back;
+
+static Pixel screen_buffer[SCR_WIDTH][SCR_HEIGHT];
 
 int screen_init(){
     if(running) return 1; // if an instance is already running, you cant create another one
@@ -55,10 +58,25 @@ int screen_init(){
 
     running = 1;
 
-    set_clear_color(VERMELHO);
+    set_clear_color(PRETO, PRETO);    
     clear_scr();
+    update_screen();
 
     return 0; // Initialization successful
+}
+
+void update_screen(){
+    int i, j;
+
+    for (i = 0;i < SCR_HEIGHT;i++){
+        for (j = 0; j < SCR_WIDTH * 9; j+=9){
+            copy_color(&screen[j + (SCR_WIDTH * 9 + 1) * i], screen_buffer[i][j/9].fore_color, screen_buffer[i][j/9].back_color);
+            screen[j + (SCR_WIDTH * 9 + 1) * i + 8] = screen_buffer[i][j/9].texture;
+        }
+
+        screen[(SCR_WIDTH * 9) * (i + 1) + i] = '\n';   
+    }
+    screen[((SCR_WIDTH * 9 + 1) * SCR_HEIGHT)] = '\0';
 }
 
 int screen_delete(){
@@ -77,24 +95,21 @@ int screen_delete(){
 }
 
 void clear_scr(){
-    int i, j;
-    char clr[9];
+    if (!running) return;
     
-    strcpy(clr, clear_color);
-    clr[8] = ' ';
-
-    for (i = 0;i < SCR_HEIGHT;i++){
-        for (j = 0; j < SCR_WIDTH * 9; j+=9)
-            memcpy(&screen[j + (SCR_WIDTH * 9 + 1) * i], clr, 9);
-
-        screen[(SCR_WIDTH * 9) * (i + 1) + i] = '\n';   
+    int i, j;
+    for (i = 0; i < SCR_WIDTH; i++){
+        for (j = 0; j < SCR_HEIGHT; j++){
+            screen_buffer[i][j].texture = ' ';
+            screen_buffer[i][j].fore_color = clear_color_fore;
+            screen_buffer[i][j].back_color = clear_color_back;
+        }
     }
-    screen[((SCR_WIDTH * 9 + 1) * SCR_HEIGHT)] = '\0';
 }
 
-void set_clear_color(Color c){
-    copy_color(clear_color, BRANCO, c);
-
+void set_clear_color(Color fore, Color back){
+    clear_color_fore = fore;
+    clear_color_back = back;
 }
 
 void printscr(){
