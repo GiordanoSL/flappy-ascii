@@ -46,60 +46,77 @@ static Color clear_color_back;
 
 static Pixel screen_buffer[SCR_WIDTH][SCR_HEIGHT];
 
-int screen_init(){
-    if(running) return 1; // if an instance is already running, you cant create another one
+int screen_init() {
+    if (running) return 1; // Cannot create a new instance if one is already running
 
-    if(!(screen = (char *) malloc(((SCR_WIDTH * 9 + 1) * SCR_HEIGHT + 1) * sizeof(char)))){
+    // Each pixel in 'screen_buffer' expands into 9 bytes in 'screen' (8 for colors + 1 for texture)
+    // Each row in 'screen' has an extra '\n' at the end (SCR_WIDTH * 9 + 1)
+    // The total size includes SCR_HEIGHT rows plus 1 byte for the null terminator
+    if (!(screen = (char *) malloc(((SCR_WIDTH * 9 + 1) * SCR_HEIGHT + 1) * sizeof(char)))) {
         printf("Couldn't allocate memory for the screen ---\n");
         return -1;
     }
 
-    printf("\033[?25l"); // Set cursor to invisible
+    // Hide the cursor while the screen is active
+    printf("\033[?25l");
 
     running = 1;
 
-    set_clear_color(PRETO, PRETO);    
-    clear_scr();
+    // Initialize the clear color and fill the screen buffer
+    set_clear_color(PRETO, PRETO);
+    clear_screen_buffer();
     update_screen();
 
     return 0; // Initialization successful
 }
 
-void update_screen(){
-    int i, j;
-
-    for (i = 0;i < SCR_HEIGHT;i++){
-        for (j = 0; j < SCR_WIDTH * 9; j+=9){
-            copy_color(&screen[j + (SCR_WIDTH * 9 + 1) * i], screen_buffer[i][j/9].fore_color, screen_buffer[i][j/9].back_color);
-            screen[j + (SCR_WIDTH * 9 + 1) * i + 8] = screen_buffer[i][j/9].texture;
-        }
-
-        screen[(SCR_WIDTH * 9) * (i + 1) + i] = '\n';   
-    }
-    screen[((SCR_WIDTH * 9 + 1) * SCR_HEIGHT)] = '\0';
-}
-
 int screen_delete(){
-    if(!running) return 1; // If there is no instance running, you cannot delete the screen
+    if(!running) return 1; // Cannot delete if there is no instance running
 
-    printf("\033[H\033[J"); // Clear the screen
-    printf("\033[?25h");    // Set cursor to visible
+    // Clear the terminal screen and move the cursor to home position
+    printf("\033[H\033[J");
+
+    // Make cursor visible again
+    printf("\033[?25h");
+
+    // Ensure changes are applied imediately
     fflush(0);
 
+    // Mark the screen as no longer running 
     running = 0;
-
+    
+    // Free the memory used for the screen array
     free(screen);
     screen = NULL;
     
     return 0;
 }
 
-void clear_scr(){
+void update_screen(){
+    int i, j;
+
+    for (i = 0;i < SCR_HEIGHT;i++){
+        for (j = 0; j < SCR_WIDTH; j++){
+            // Write 8-byte color escape codes + 1-byte texture into the linear screen array
+            copy_color(&screen[j * 9 + (SCR_WIDTH * 9 + 1) * i], 
+                        screen_buffer[i][j].fore_color, 
+                        screen_buffer[i][j].back_color);
+            screen[j * 9 + (SCR_WIDTH * 9 + 1) * i + 8] = screen_buffer[i][j].texture;
+        }
+        // Add newline at the end of each row
+        screen[(SCR_WIDTH * 9) * (i + 1) + i] = '\n';   
+    }
+    // Null-terminate the screen array
+    screen[((SCR_WIDTH * 9 + 1) * SCR_HEIGHT)] = '\0';
+}
+
+void clear_screen_buffer(){
     if (!running) return;
     
     int i, j;
     for (i = 0; i < SCR_WIDTH; i++){
         for (j = 0; j < SCR_HEIGHT; j++){
+            // Reset each pixel character to space and the clear colors
             screen_buffer[i][j].texture = ' ';
             screen_buffer[i][j].fore_color = clear_color_fore;
             screen_buffer[i][j].back_color = clear_color_back;
@@ -112,13 +129,24 @@ void set_clear_color(Color fore, Color back){
     clear_color_back = back;
 }
 
-void printscr(){
+void printscr() {
+    // Clear the terminal screen and move the cursor to home position
     printf("\033[H\033[J");
+
+    // Print the screen array
     printf("%s", screen);
+
+    // Reset terminal color attributes to default
     printf("\033[0m");
+
+    // Ensure all output is written immediately
     fflush(0);
 }
 
+// Write ANSI escape codes for foreground and background colors into DEST.
+// DEST must have at least 8 bytes; no null terminator is added.
+// Foreground defaults to white if invalid; background is reduced modulo 8 
+// since there are only 8 colors available for the background instead of 16.
 void copy_color(char * DEST, Color fore, Color back){
     switch (fore){
     case PRETO:
@@ -174,7 +202,7 @@ void copy_color(char * DEST, Color fore, Color back){
         break;
     }
 
-    back %= 8; // there are only 8 available colors for the background
+    back = (Color) (back % 8); // There are only 8 available colors for the background
 
     switch (back){
     case PRETO:

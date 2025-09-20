@@ -102,7 +102,7 @@ int main() {
 
     while (running){
         usleep(100000);
-        clear_scr();
+        clear_screen_buffer();
         update_screen();
         printscr();
     }

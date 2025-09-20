@@ -1,7 +1,25 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-typedef unsigned char Color;
+typedef enum _color{
+    PRETO = 0,
+    VERMELHO,
+    VERDE,
+    AMARELO,
+    AZUL,
+    MAGENTA,
+    CIANO,
+    CINZA_CLARO,
+    CINZA,
+    VERMELHO_CLARO,
+    VERDE_CLARO,
+    AMARELO_CLARO,
+    AZUL_CLARO,
+    MAGENTA_CLARO,
+    CIANO_CLARO,
+    BRANCO
+} Color;
+
 typedef struct _pixel
 {
     char texture;
@@ -9,36 +27,31 @@ typedef struct _pixel
     Color back_color;
 }Pixel;
 
+// Initialize the screen and allocate memory for the screen array and buffer.
+// Returns:
+//   0  - Initialization successful
+//   1  - A screen instance is already running
+//  -1  - Memory allocation failed
+int screen_init(void);
 
-#define PRETO 0
-#define VERMELHO 1
-#define VERDE 2
-#define AMARELO 3
-#define AZUL 4
-#define MAGENTA 5
-#define CIANO 6
-#define CINZA_CLARO 7
-#define CINZA 8
-#define VERMELHO_CLARO 9
-#define VERDE_CLARO 10
-#define AMARELO_CLARO 11
-#define AZUL_CLARO 12
-#define MAGENTA_CLARO 13
-#define CIANO_CLARO 14
-#define BRANCO 15
+// Free memory used by the screen array and reset terminal state.
+// Returns:
+//   0  - Deletion successful
+//   1  - No screen instance is running
+int screen_delete(void);
 
-int screen_init();
-
-void set_pixel(int x, int y, Pixel p);
-
-void clear_scr();
-
+// Set the foreground and background colors used when clearing the screen.
 void set_clear_color(Color fore, Color back);
 
-int screen_delete();
+// Clear the screen buffer using the currently set clear colors.
+// Note: This updates the buffer only; the terminal is not updated.
+void clear_screen_buffer(void);
 
-void update_screen();
+// Copy the screen buffer into the linear screen array.
+// Note: This does not print to the terminal.
+void update_screen(void);
 
-void printscr();
+// Print the current screen array to the terminal.
+void printscr(void);
 
-#endif
+#endif // SCREEN_H
