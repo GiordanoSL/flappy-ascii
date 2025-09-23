@@ -99,12 +99,18 @@ int main() {
     if(screen_init()) exit(0);
 
     printscr();
+    set_clear_color(BRANCO, BRANCO);
 
+    int i = 5;
     while (running){
         usleep(100000);
         clear_screen_buffer();
+        set_pixel(1, 1, '#', BRANCO, i%8);
+        draw_rect(5, 3, 4, 5, ' ', AMARELO, VERMELHO, true);
+        draw_rect_outline(10, 10, 10, 5, '#', AMARELO, PRETO);
         update_screen();
         printscr();
+        i++;
     }
     
     
