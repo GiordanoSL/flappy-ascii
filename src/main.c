@@ -103,7 +103,7 @@ int main() {
 
     int i = 5;
     while (running){
-        usleep(100000);
+        usleep(16666);
         clear_screen_buffer();
         set_pixel(1, 1, '#', BRANCO, i%8);
         draw_rect(5, 3, 4, 5, ' ', AMARELO, VERMELHO, true);

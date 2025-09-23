@@ -16,7 +16,7 @@ OBJ = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC))
 
 # Define the compiler and flags.
 CC = gcc
-CFLAGS = -Wall -g -lpthread -I$(INCLUDE_DIR)
+CFLAGS = -Wall -g -lpthread -I$(INCLUDE_DIR) -O3
 
 # The default target. This is the first target executed when you run `make`.
 # It depends on the $(TARGET) executable.

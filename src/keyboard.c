@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <termios.h>
 #include <stdlib.h>
+#include <sys/select.h>
 
 // Struct para guardar as configurações canonicas do input do teclado
 static struct termios oldt;
@@ -29,32 +30,46 @@ static void disable_raw_mode() {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 }
 
+
 static void* keyboard_loop(void* arg) {
     char c, seq[2];
     while (running) {
-        c = getchar(); // blocks until keypress
-        
-        if(c == 27){ // ESCAPE character read
-            seq[0] = getchar();
-            if (seq[0] != '['){
-                if (handler) handler(seq[0]);
-                continue;
-            }
-            // We know it is an escape sequence
-            seq[1] = getchar();
-            switch (seq[1]){
-            case 'A': c = KEY_UP; break;
-            case 'B': c = KEY_DOWN; break;;
-            case 'C': c = KEY_RIGHT; break;
-            case 'D': c = KEY_LEFT; break;
-            default:
-                printf("\n-unknown escape sequence-\n");
-                break;
-            }
-        }
+        fd_set set;
+        struct timeval timeout;
 
-        if (handler) handler(c);
-        usleep(16666);
+        FD_ZERO(&set);
+        FD_SET(STDIN_FILENO, &set);
+
+        // ~16ms timeout (like your old usleep(16666))
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 16666;
+
+        int rv = select(STDIN_FILENO + 1, &set, NULL, NULL, &timeout);
+
+        if (rv > 0 && FD_ISSET(STDIN_FILENO, &set)) {
+            c = getchar();
+
+            if (c == 27) { // ESC
+                seq[0] = getchar();
+                if (seq[0] != '[') {
+                    if (handler) handler(seq[0]);
+                    continue;
+                }
+                seq[1] = getchar();
+                switch (seq[1]) {
+                case 'A': c = KEY_UP;    break;
+                case 'B': c = KEY_DOWN;  break;
+                case 'C': c = KEY_RIGHT; break;
+                case 'D': c = KEY_LEFT;  break;
+                default:
+                    printf("\n-unknown escape sequence-\n");
+                    break;
+                }
+            }
+
+            if (handler) handler(c);
+        }
+        // If rv == 0: timeout expired -> just loop again
     }
     return NULL;
 }
