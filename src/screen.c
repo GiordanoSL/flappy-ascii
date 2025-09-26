@@ -123,8 +123,8 @@ void set_pixel(int pos_x, int pos_y, char texture, Color fore, Color back){
 void draw_rect(int pos_x, int pos_y, int width, int height, char texture, Color fore, Color back, bool Border){
     if (!running) return;
 
-    for (int i = pos_x; i < pos_x + width - 1; i++)
-        for (int j = pos_y; j < pos_y + height - 1; j++)
+    for (int i = pos_x; i < pos_x + width; i++)
+        for (int j = pos_y; j < pos_y + height; j++)
             set_pixel(i, j, texture, fore, back);    
     
     if(!Border) return;

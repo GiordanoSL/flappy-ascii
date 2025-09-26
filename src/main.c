@@ -68,20 +68,22 @@ int main() {
     if(screen_init()) exit(0);
 
     flappy = bird_create();
+    pipe_create(); // creates the first pipe
     printscr();
 
     int i = 0, y;
     while (running){
         usleep(16666);
 
-        if(i%10 == 0){
-            y = bird_get_pos(flappy);
-            if (y >= SCR_HEIGHT - 4)
-                bird_kill(flappy);
+        if(i%7 == 0){
             bird_update(flappy);
             pipes_update();
-            if(!i)
-                pipe_create();
+            pipes_check_colision(flappy);
+            y = bird_get_pos(flappy);
+            if (y >= SCR_HEIGHT - 4){
+                bird_kill(flappy);
+                bird_set_pos(flappy, SCR_HEIGHT - 4);
+            }
         }
         clear_screen_buffer();
         update_screen();

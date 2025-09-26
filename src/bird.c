@@ -66,6 +66,12 @@ int bird_get_pos(Bird * b){
     return b->pos;
 }
 
+void bird_set_pos(Bird * b, int pos_y){
+    if (b == NULL) return;
+
+    b->pos = pos_y;
+}
+
 int bird_get_velocity(Bird * b){
     if (b == NULL) return __INT32_MAX__;
 
@@ -80,7 +86,6 @@ bool bird_is_alive(Bird * b){
 
 void bird_update(Bird * b){
     if(b == NULL) return;
-    if(!b->alive) return;
 
     b->pos += b->v;
 

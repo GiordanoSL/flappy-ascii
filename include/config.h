@@ -6,5 +6,5 @@
 
 // Pipe mechanics
 #define PIPE_SPEED   1
-#define PIPE_GAP     6
-#define PIPE_SPAWN_INTERVAL 30 // frames between new pipes
+#define PIPE_GAP     8
+#define PIPE_SPAWN_INTERVAL  25// space between new pipes

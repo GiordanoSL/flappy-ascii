@@ -10,6 +10,8 @@ void bird_destroy(Bird ** b);
 
 int bird_get_pos(Bird * b);
 
+void bird_set_pos(Bird * b, int pos);
+
 int bird_get_velocity(Bird * b);
 
 bool bird_is_alive(Bird * b);
