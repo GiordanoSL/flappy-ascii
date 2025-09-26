@@ -3,6 +3,7 @@
 #include "screen.h"
 #include "config.h"
 #include "pipes.h"
+#include <unistd.h>
 
 Color pipe_fore = PRETO;
 Color pipe_back = VERDE;
@@ -75,9 +76,10 @@ int pipes_check_colision(Bird * b){
 
 
     while (aux != NULL){
-        if(aux->pos_x >= BIRD_X_POS && aux->pos_x <= BIRD_X_POS+4){
-            if(b_pos < aux->pos_y || b_pos + 3 > aux->pos_y + PIPE_GAP)
-                bird_kill(b);
+        if(aux->pos_x + 2 >= BIRD_X_POS && aux->pos_x <= BIRD_X_POS + 3){
+            if(b_pos < aux->pos_y || b_pos + 3 > aux->pos_y + PIPE_GAP)                
+                return 1;
+            else return 0;
         }
         aux = aux->next;
     }

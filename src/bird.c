@@ -8,12 +8,12 @@ static char bird_sprite[2][3][4] =
 {
     {// falling frame
         {' ', '(', '@', '>'}, //  (@>
-        {'/', '|', '|', ' '}, // \||
+        {'/', '|', '\\', ' '}, // /||
         {' ', '\"','\"',' '}  //  ""
     },
     {// flying frame
         {' ', '(', '@', '>'}, //  (@>
-        {'\\','|', '|', ' '}, // /||
+        {'\\','|', '/', ' '}, // \||
         {' ', '\"','\"',' '}  //  ""
     }
 };
@@ -89,7 +89,7 @@ void bird_update(Bird * b){
 
     b->pos += b->v;
 
-    if (b->v + GRAVITY < MAX_FALL_SPEED)
+    if (b->v + GRAVITY <= MAX_FALL_SPEED)
         b->v += GRAVITY;
 }
 

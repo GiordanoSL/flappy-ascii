@@ -23,7 +23,7 @@ use printscr() to render it in the terminal.
 #include <stdbool.h>
 
 #define SCR_WIDTH 48
-#define SCR_HEIGHT 50
+#define SCR_HEIGHT 30
 
 typedef enum _color{
     PRETO = 0,

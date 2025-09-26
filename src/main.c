@@ -75,25 +75,26 @@ int main() {
     while (running){
         usleep(16666);
 
+        clear_screen_buffer();
+        update_screen();
+        draw_rect(0, SCR_HEIGHT - 2, SCR_WIDTH, 2, '#', VERDE_CLARO, VERDE, true);
+        update_screen();
+        bird_draw(flappy);
+        pipes_draw();
+        update_screen();
+        printscr();
+
         if(i%7 == 0){
             bird_update(flappy);
             pipes_update();
-            pipes_check_colision(flappy);
+            if(pipes_check_colision(flappy))
+                bird_kill(flappy);
             y = bird_get_pos(flappy);
             if (y >= SCR_HEIGHT - 4){
                 bird_kill(flappy);
                 bird_set_pos(flappy, SCR_HEIGHT - 4);
             }
         }
-        clear_screen_buffer();
-        update_screen();
-        draw_rect(0, SCR_HEIGHT - 2, SCR_WIDTH, 2, '#', VERDE_CLARO, VERDE, true);
-        update_screen();
-        bird_draw(flappy);
-        update_screen();
-        pipes_draw();
-        update_screen();
-        printscr();
         i++;
         i%= 150;
     }
