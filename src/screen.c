@@ -41,8 +41,8 @@ static int running = 0;
 
 static char * screen = NULL;
 
-static Color clear_color_fore;
-static Color clear_color_back;
+static Color clear_color_fore = BRANCO;
+static Color clear_color_back = PRETO;
 
 static Pixel screen_buffer[SCR_HEIGHT][SCR_WIDTH];
 
@@ -62,8 +62,7 @@ int screen_init() {
 
     running = 1;
 
-    // Initialize the clear color and fill the screen buffer
-    set_clear_color(BRANCO, PRETO);
+    // Fill the screen buffer
     clear_screen_buffer();
     update_screen();
 
@@ -201,15 +200,6 @@ void printscr() {
 // Foreground defaults to white if invalid; background is reduced modulo 8 
 // since there are only 8 colors available for the background instead of 16.
 void copy_color(char * DEST, Color fore, Color back){
-    if(fore == CLEAR){
-        copy_color(DEST, clear_color_fore, back);
-        return;
-    }
-
-    if(back == CLEAR){
-        copy_color(DEST, fore, clear_color_back);
-        return;
-    }
 
     switch (fore){
     case PRETO:
@@ -260,11 +250,15 @@ void copy_color(char * DEST, Color fore, Color back){
     case BRANCO:
         memcpy(DEST, fore_white, 5);
         break;
+    case CLEAR:
+        break;
     default:
         memcpy(DEST, fore_white, 5);
         break;
     }
 
+    if(back == CLEAR) return;
+    
     back = (Color) (back % 8); // There are only 8 available colors for the background
 
     switch (back){

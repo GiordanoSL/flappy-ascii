@@ -3,81 +3,47 @@
 #include <stdlib.h>
 #include "keyboard.h"
 #include "screen.h"
+#include "bird.h"
 
 volatile int running;
 
-int posx = 0, posy = 0;
-
-void draw_flappy(int x, int y){
-
-    printf("\x1b[0m\x1b[%d;%dH", y, x*2);
-    printf("\x1b[48;5;6m\x1b[38;5;0m");
-    printf("    _   ");
-    printf("\x1b[48;5;0m\x1b[%d;%dH", y + 1, x*2);
-    printf("\x1b[48;5;6m __\x1b[48;5;11m(\x1b[48;5;7m@\x1b[48;5;11m)\x1b[48;5;6m\x1b[38;5;9m=");
-    printf("\x1b[48;5;6m\x1b[38;5;0m");
-    printf(" ");
-    printf("\x1b[48;5;0m\x1b[%d;%dH", y + 2, x*2);
-    printf("\x1b[48;5;6m \\\x1b[48;5;11m_/_)");
-    printf("\x1b[48;5;6m\x1b[38;5;0m");
-    printf("  ");
-    printf("\x1b[?25l");
-
-}
-
-void draw_screen(){
-    printf("\033[1J");
-    for (int i = 0; i < 48; i++)
-    {
-        printf("\x1b[0m\x1b[%d;0H", i);
-        printf("\x1b[48;5;6m\x1b[38;5;0m                                                                                                                                \n");
-    
-    }
-    
-}
+Bird * flappy;
 
 void my_handler(char c) {
     if(c == KEY_BACKSPACE){
         printf("\033[1D\033[0K");
         return;
     }
-    switch (c)
-    {
-    case KEY_UP:
-        posy = (posy > 0)?posy-1:posy;
-        break;
-    case KEY_DOWN:
-        posy = (posy < 48)?posy+1:posy;
-        break;
-    case KEY_RIGHT:
-        posx = (posx < 64)?posx+1:posx;
-        break;
-    case KEY_LEFT:
-        posx = (posx > 0)?posx-1:posx;
-        break;
+    switch (c){
     case KEY_0:
-        set_clear_color(VERMELHO,PRETO);
+        set_clear_color(PRETO,PRETO);
         break;
     case KEY_1:
         set_clear_color(VERMELHO,VERMELHO);
         break;
     case KEY_2:
-        set_clear_color(VERMELHO,VERDE);
+        set_clear_color(VERDE,VERDE);
         break;
     case KEY_3:
-        set_clear_color(VERMELHO,AMARELO);
+        set_clear_color(AMARELO,AMARELO);
         break;
     case KEY_4:
-        set_clear_color(VERMELHO,AZUL);
+        set_clear_color(AZUL,AZUL);
         break;
     case KEY_5:
-        set_clear_color(VERMELHO,MAGENTA);
+        set_clear_color(MAGENTA,MAGENTA);
         break;
     case KEY_6:
-        set_clear_color(VERMELHO,CIANO);
+        set_clear_color(CIANO,CIANO);
         break;
     case KEY_7:
-        set_clear_color(VERMELHO,BRANCO);
+        set_clear_color(BRANCO,BRANCO);
+        break;
+    case KEY_SPACE:
+        bird_flap(flappy);
+        break;
+    case KEY_ENTER:
+        bird_respawn(flappy);
         break;
     
     default:
@@ -96,50 +62,36 @@ int main() {
 
     keyboard_init();
     keyboard_set_handler(my_handler);
+
+    set_clear_color(CIANO, CIANO);
     if(screen_init()) exit(0);
 
+    flappy = bird_create();
     printscr();
-    set_clear_color(BRANCO, BRANCO);
 
-    int i = 5;
+    int i = 0, y;
     while (running){
         usleep(16666);
+
+        if(!i){
+            y = bird_get_pos(flappy);
+            if (y >= SCR_HEIGHT - 4)
+                bird_kill(flappy);
+            bird_update(flappy); 
+        }
         clear_screen_buffer();
-        set_pixel(1, 1, '#', BRANCO, i%8);
-        draw_rect(5, 3, 4, 5, ' ', AMARELO, VERMELHO, true);
-        draw_rect_outline(10, 10, 10, 5, '#', AMARELO, PRETO);
+        update_screen();
+        draw_rect(0, SCR_HEIGHT - 2, SCR_WIDTH, 2, ' ', CLEAR, VERDE, true);
+        update_screen();
+        bird_draw(flappy);
         update_screen();
         printscr();
         i++;
+        i%= 10;
     }
-    
-    
-    // draw_screen();
-    // draw_flappy(posx, posy);
     
     keyboard_shutdown();
     screen_delete();
     return 0;
 }
 
-/*
-              @@@@@@@@@@             
-            @@@:::::::@@.-@              
-          @@::::::::@@.....@@          
-      #@@@@@@:::::::@@...-@..@@        
-     @%......@@:::::@@...-@..@@        
-     @%........@@:::::@@.....@@        
-     @%:.....::@@:::::::@@@@@@@@       
-      #@:::::@@:::::::@@========@@     
-        @@@@@:::::::@@==@@@@@@@@       
-            @:::::::::@@=======@       
-             @@@@:::::::@@@@@@@@       
-                 @@@@@@@               
-
-      
-   _ 
-__(.)>
-\_/_)    
-
-                                                
-*/
