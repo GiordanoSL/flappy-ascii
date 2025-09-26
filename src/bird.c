@@ -42,8 +42,10 @@ struct _bird{
 
 Bird * bird_create(){
     Bird * b = (Bird *) malloc(sizeof(Bird));
-    if(b == NULL) exit(0);
-
+    if(b == NULL){
+        perror("Allocation failed for new Bird");
+        exit(1);
+    } 
     b->alive = true;
     b->pos = SCR_HEIGHT/2 - 1;
     b->v = 0;
@@ -51,11 +53,11 @@ Bird * bird_create(){
     return b;
 }
 
-void bird_destroy(Bird * b){
-    if (b == NULL) return;
+void bird_destroy(Bird ** b){
+    if (*b == NULL) return;
 
-    free(b);
-    b = NULL;
+    free(*b);
+    *b = NULL;
 }
 
 int bird_get_pos(Bird * b){
@@ -119,7 +121,7 @@ void bird_draw(Bird * b){
 
     for (int i = 0; i < 3; i++){
         for (int j = 0; j < 4; j++){
-            set_pixel(SCR_WIDTH/2 - 4 + j, b->pos + i, bird_sprite[v][i][j], bird_fore[i][j], bird_back[i][j]);
+            set_pixel(BIRD_X_POS + j, b->pos + i, bird_sprite[v][i][j], bird_fore[i][j], bird_back[i][j]);
         }
         
     }

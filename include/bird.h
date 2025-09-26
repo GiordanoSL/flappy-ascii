@@ -6,7 +6,7 @@ typedef struct _bird Bird;
 Bird * bird_create();
 
 
-void bird_destroy(Bird * b);
+void bird_destroy(Bird ** b);
 
 int bird_get_pos(Bird * b);
 

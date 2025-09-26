@@ -4,6 +4,7 @@
 #include "keyboard.h"
 #include "screen.h"
 #include "bird.h"
+#include "pipes.h"
 
 volatile int running;
 
@@ -73,21 +74,26 @@ int main() {
     while (running){
         usleep(16666);
 
-        if(!i){
+        if(i%10 == 0){
             y = bird_get_pos(flappy);
             if (y >= SCR_HEIGHT - 4)
                 bird_kill(flappy);
-            bird_update(flappy); 
+            bird_update(flappy);
+            pipes_update();
+            if(!i)
+                pipe_create();
         }
         clear_screen_buffer();
         update_screen();
-        draw_rect(0, SCR_HEIGHT - 2, SCR_WIDTH, 2, ' ', CLEAR, VERDE, true);
+        draw_rect(0, SCR_HEIGHT - 2, SCR_WIDTH, 2, '#', VERDE_CLARO, VERDE, true);
         update_screen();
         bird_draw(flappy);
         update_screen();
+        pipes_draw();
+        update_screen();
         printscr();
         i++;
-        i%= 10;
+        i%= 150;
     }
     
     keyboard_shutdown();

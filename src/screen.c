@@ -53,8 +53,8 @@ int screen_init() {
     // Each row in 'screen' has an extra '\n' at the end (SCR_WIDTH * 9 + 1)
     // The total size includes SCR_HEIGHT rows plus 1 byte for the null terminator
     if (!(screen = (char *) malloc(((SCR_WIDTH * 9 + 1) * SCR_HEIGHT + 1) * sizeof(char)))) {
-        printf("Couldn't allocate memory for the screen ---\n");
-        return -1;
+        perror("Couldn't allocate memory for the screen ---\n");
+        exit(-1);
     }
 
     // Hide the cursor while the screen is active
@@ -113,7 +113,7 @@ void update_screen(){
 
 void set_pixel(int pos_x, int pos_y, char texture, Color fore, Color back){
     if(!running) return;
-    if(pos_x < 0 || pos_x > SCR_WIDTH || pos_y < 0 || pos_y > SCR_HEIGHT) return;
+    if(pos_x < 0 || pos_x >= SCR_WIDTH || pos_y < 0 || pos_y >= SCR_HEIGHT) return;
 
     screen_buffer[pos_y][pos_x].texture = texture;
     screen_buffer[pos_y][pos_x].fore_color = fore;
