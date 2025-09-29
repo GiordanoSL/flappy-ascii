@@ -78,9 +78,9 @@ int main() {
         clear_screen_buffer();
         update_screen();
         draw_rect(0, SCR_HEIGHT - 2, SCR_WIDTH, 2, '#', VERDE_CLARO, VERDE, true);
+        pipes_draw();
         update_screen();
         bird_draw(flappy);
-        pipes_draw();
         update_screen();
         printscr();
 

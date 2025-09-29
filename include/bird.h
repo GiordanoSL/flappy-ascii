@@ -1,6 +1,11 @@
 #ifndef BIRD_H
 #define BIRD_H
 
+#include <stdbool.h>
+
+#define BIRD_WIDTH  4
+#define BIRD_HEIGHT 3
+
 typedef struct _bird Bird;
 
 Bird * bird_create();

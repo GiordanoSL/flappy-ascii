@@ -32,7 +32,9 @@ static void disable_raw_mode() {
 
 
 static void* keyboard_loop(void* arg) {
-    char c, seq[2];
+    unsigned char buf[8];
+    char c;
+
     while (running) {
         fd_set set;
         struct timeval timeout;
@@ -40,37 +42,44 @@ static void* keyboard_loop(void* arg) {
         FD_ZERO(&set);
         FD_SET(STDIN_FILENO, &set);
 
-        // ~16ms timeout (like your old usleep(16666))
         timeout.tv_sec = 0;
-        timeout.tv_usec = 16666;
+        timeout.tv_usec = 16666; // ~16 ms
 
         int rv = select(STDIN_FILENO + 1, &set, NULL, NULL, &timeout);
 
         if (rv > 0 && FD_ISSET(STDIN_FILENO, &set)) {
-            c = getchar();
+            int n = read(STDIN_FILENO, buf, sizeof(buf));
 
-            if (c == 27) { // ESC
-                seq[0] = getchar();
-                if (seq[0] != '[') {
-                    if (handler) handler(seq[0]);
-                    continue;
+            if (n > 0) {
+                if (buf[0] == 27) { // ESC
+                    if (n == 1) {
+                        // Just ESC pressed alone
+                        c = KEY_ESCAPE;
+                    } else if (n >= 3 && buf[1] == '[') {
+                        switch (buf[2]) {
+                            case 'A': c = KEY_UP;    break;
+                            case 'B': c = KEY_DOWN;  break;
+                            case 'C': c = KEY_RIGHT; break;
+                            case 'D': c = KEY_LEFT;  break;
+                            default:
+                                // Unknown escape sequence
+                                continue;
+                        }
+                    } else {
+                        // ESC followed by something else
+                        continue;
+                    }
+                } else {
+                    // Normal key (letters, numbers, etc.)
+                    c = buf[0];
                 }
-                seq[1] = getchar();
-                switch (seq[1]) {
-                case 'A': c = KEY_UP;    break;
-                case 'B': c = KEY_DOWN;  break;
-                case 'C': c = KEY_RIGHT; break;
-                case 'D': c = KEY_LEFT;  break;
-                default:
-                    printf("\n-unknown escape sequence-\n");
-                    break;
-                }
+
+                if (handler) handler(c);
             }
-
-            if (handler) handler(c);
         }
-        // If rv == 0: timeout expired -> just loop again
+        // If rv == 0: timeout expired, just loop again
     }
+
     return NULL;
 }
 

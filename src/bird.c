@@ -4,16 +4,16 @@
 #include "bird.h"
 #include "config.h"
 
-static char bird_sprite[2][3][4] = 
+static char bird_sprite[2][BIRD_HEIGHT][BIRD_WIDTH] = 
 {
     {// falling frame
-        {' ', '(', '@', '>'}, //  (@>
-        {'/', '|', '\\', ' '}, // /||
-        {' ', '\"','\"',' '}  //  ""
+        {' ', '(', '@', '>'}, // ' (@>'
+        {'/', '/','\\', ' '}, // '//\ '
+        {' ', '\"','\"',' '}  // ' "" '
     },
     {// flying frame
         {' ', '(', '@', '>'}, //  (@>
-        {'\\','|', '/', ' '}, // \||
+        {'\\','/', '/', ' '}, // \//
         {' ', '\"','\"',' '}  //  ""
     }
 };
@@ -124,8 +124,8 @@ void bird_draw(Bird * b){
 
     int v = (b->v > 0)? 1 : 0; // if velocity is positive -> falling frame, else -> flying frame
 
-    for (int i = 0; i < 3; i++){
-        for (int j = 0; j < 4; j++){
+    for (int i = 0; i < BIRD_HEIGHT; i++){
+        for (int j = 0; j < BIRD_WIDTH; j++){
             set_pixel(BIRD_X_POS + j, b->pos + i, bird_sprite[v][i][j], bird_fore[i][j], bird_back[i][j]);
         }
         
