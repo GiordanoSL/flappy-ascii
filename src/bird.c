@@ -47,7 +47,7 @@ Bird * bird_create(){
         exit(1);
     } 
     b->alive = true;
-    b->pos = SCR_HEIGHT/2 - 1;
+    b->pos = BIRD_START_Y;
     b->v = 0;
 
     return b;
@@ -130,5 +130,5 @@ void bird_draw(Bird * b){
         }
         
     }
-    
+    update_screen();
 }

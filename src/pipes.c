@@ -4,6 +4,7 @@
 #include "config.h"
 #include "pipes.h"
 #include <unistd.h>
+#include <time.h>
 
 Color pipe_fore = PRETO;
 Color pipe_back = VERDE;
@@ -18,6 +19,9 @@ struct _pipe
 static Pipe * head = NULL;
 
 void pipe_create(){
+
+    srand(time(NULL));
+
     Pipe * new_p = (Pipe *) malloc(sizeof(Pipe));
     if(new_p == NULL){
         perror("Allocation failed for new Pipe");
@@ -52,6 +56,12 @@ void pipe_delete(Pipe ** p){
     *p = next;
 }
 
+void pipes_destroy(){
+    while (head != NULL){
+        pipe_delete(&head);
+    }
+}
+
 void pipes_update(){
     Pipe ** p = &head;
 
@@ -78,7 +88,8 @@ int pipes_check_colision(Bird * b){
     while (aux != NULL){
         if(aux->pos_x + PIPE_WIDTH - 1 >= BIRD_X_POS && aux->pos_x <= BIRD_X_POS + BIRD_WIDTH - 1){
             if(b_pos < aux->pos_y || b_pos + BIRD_HEIGHT - 1 > aux->pos_y + PIPE_GAP)                
-                return 1;
+                return -1;
+            else if(aux->pos_x == BIRD_X_POS) return 1;
             else return 0;
         }
         aux = aux->next;
@@ -94,4 +105,6 @@ void pipes_draw(){
         draw_rect(aux->pos_x, aux->pos_y + PIPE_GAP, PIPE_WIDTH, SCR_HEIGHT - aux->pos_y + PIPE_GAP, ' ', pipe_fore, pipe_back, true);
         aux = aux->next;
     }
+
+    update_screen();
 }

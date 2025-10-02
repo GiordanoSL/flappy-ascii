@@ -3,6 +3,7 @@
 #define FLAP_VELOCITY -2
 #define MAX_FALL_SPEED 5
 #define BIRD_X_POS SCR_WIDTH/2 - 4 
+#define BIRD_START_Y  SCR_HEIGHT/2 - 1
 
 // Pipe mechanics
 #define PIPE_SPEED  1
