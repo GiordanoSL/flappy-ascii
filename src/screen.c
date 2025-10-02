@@ -125,7 +125,9 @@ void draw_rect(int pos_x, int pos_y, int width, int height, char texture, Color 
 
     for (int i = pos_x; i < pos_x + width; i++)
         for (int j = pos_y; j < pos_y + height; j++)
-            set_pixel(i, j, texture, fore, back);    
+            set_pixel(i, j, texture, fore, back);  
+    
+    update_screen();  
     
     if(!Border) return;
 
@@ -143,6 +145,8 @@ void draw_rect(int pos_x, int pos_y, int width, int height, char texture, Color 
     set_pixel(pos_x + width - 1, pos_y, '+', fore, back);
     set_pixel(pos_x, pos_y + height - 1, '+', fore, back);
     set_pixel(pos_x + width - 1, pos_y + height - 1, '+', fore, back);
+
+    update_screen();
 }
 
 // Draw a rectangle outline on the screen buffer.
@@ -158,6 +162,7 @@ void draw_rect_outline(int pos_x, int pos_y, int width, int height, char texture
         set_pixel(pos_x, i, texture, fore, back);
         set_pixel(pos_x + width - 1, i, texture, fore, back);
     }    
+    update_screen();
 }
 
 void clear_screen_buffer(){

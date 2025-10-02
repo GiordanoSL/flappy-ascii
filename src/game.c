@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#define MAX_SCORE 99
+
 typedef enum {
     GAME_INIT,
     GAME_MENU,
@@ -59,6 +61,7 @@ void draw_text_center(const char * text, int len, int pos_y, Color fore, Color b
     for (int i = 0; i < len; i++){
         set_pixel(pos_x + i, pos_y, text[i], fore, back);
     }
+    update_screen();
 }
 
 void draw_menu_text(){
@@ -86,7 +89,7 @@ void draw_background(){
 }
 
 void draw_score(int SCORE_X_POS, int SCORE_Y_POS){
-    int first_digit = score / 10;
+    int first_digit  = score / 10;
     int second_digit = score % 10;
 
     // Drawing first digit
@@ -107,10 +110,31 @@ void draw_score(int SCORE_X_POS, int SCORE_Y_POS){
 void draw_over(){
     draw_background();
     pipes_draw();
-    draw_score(SCR_WIDTH/2 - 3, 1);
     bird_draw(flappy);
+    draw_rect(SCR_WIDTH/2 - 6, SCR_HEIGHT/2 - 9, 12, 3, ' ', VERMELHO, PRETO, true);
+    draw_text_center("GAME  OVER", 10, SCR_HEIGHT/2 - 8, VERMELHO, PRETO);
+    draw_text_center("FINAL SCORE:", 12, SCR_HEIGHT/2 - 3, CINZA, PRETO);
+    draw_rect(SCR_WIDTH/2 - 6, SCR_HEIGHT/2 - 2, 12, 4, ' ', AMARELO, PRETO, true);
+    draw_score(SCR_WIDTH/2 - 3, SCR_HEIGHT/2 - 2);
+    draw_text_center("PRESS ESC TO EXIT GAME", 22, SCR_HEIGHT/2 + 5, CINZA, BRANCO);
+    draw_text_center("PRESS 'R' TO RESTART", 20, SCR_HEIGHT/2 + 7, CINZA, BRANCO);
     printscr();
 }
+
+void draw_win(){
+    draw_background();
+    pipes_draw();
+    bird_draw(flappy);
+    draw_rect(SCR_WIDTH/2 - 6, SCR_HEIGHT/2 - 9, 12, 3, ' ', AMARELO, PRETO, true);
+    draw_text_center("YOU  WIN", 8, SCR_HEIGHT/2 - 8, AMARELO, PRETO);
+    draw_text_center("FINAL SCORE:", 12, SCR_HEIGHT/2 - 3, CINZA, PRETO);
+    draw_rect(SCR_WIDTH/2 - 6, SCR_HEIGHT/2 - 2, 12, 4, ' ', AMARELO, PRETO, true);
+    draw_score(SCR_WIDTH/2 - 3, SCR_HEIGHT/2 - 2);
+    draw_text_center("PRESS ESC TO EXIT GAME", 22, SCR_HEIGHT/2 + 5, CINZA, BRANCO);
+    draw_text_center("PRESS 'R' TO RESTART", 20, SCR_HEIGHT/2 + 7, CINZA, BRANCO);
+    printscr();
+}
+
 
 void update_game(){
     int y, colision;
@@ -121,11 +145,13 @@ void update_game(){
     colision = pipes_check_colision(flappy);
 
     if(colision == -1) bird_kill(flappy);
-    else if(colision == 1)
+    else if(colision == 1 && bird_is_alive(flappy))
         score ++;
 
-    if(score > 99)
+    if(score >= MAX_SCORE){
+        keyboard_set_handler(over_key_handler);
         current = GAME_WIN;
+    }
     
     y = bird_get_pos(flappy);
 
@@ -134,7 +160,6 @@ void update_game(){
         bird_set_pos(flappy, SCR_HEIGHT - 4);
         current = GAME_OVER;
         keyboard_set_handler(over_key_handler);
-        draw_over();
     }
 }
 
@@ -183,7 +208,12 @@ void game_run(){
         case GAME_PAUSED:
             break;
         case GAME_OVER:
+            sleep(1);
+            draw_over();
             break;
+        case GAME_WIN:
+            sleep(1);
+            draw_win();
         case GAME_EXIT:
             break;
         default:
