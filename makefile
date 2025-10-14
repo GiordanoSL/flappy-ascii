@@ -1,42 +1,39 @@
-# Define the project name, which will be the name of the executable.
+# Project name (without path)
 TARGET = flappy_bird
 
-# Define the directories for source and header files.
+# Directories
 SRC_DIR = src
 INCLUDE_DIR = include
 BUILD_DIR = build
 
-# Find all C source files (.c) in the source directory.
-# The `wildcard` function is used to find all files that match the pattern.
+# Source and object files
 SRC = $(wildcard $(SRC_DIR)/*.c)
-
-# Create a list of object files (.o) from the source files.
-# The `patsubst` function substitutes the file extension.
 OBJ = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC))
+EXEC = $(BUILD_DIR)/$(TARGET)
 
-# Define the compiler and flags.
+# Compiler and flags
 CC = gcc
 CFLAGS = -Wall -g -lpthread -I$(INCLUDE_DIR) -O3
 
-# The default target. This is the first target executed when you run `make`.
-# It depends on the $(TARGET) executable.
-all: $(TARGET)
+# Default target
+all: $(EXEC)
 
-# Rule to link the object files into the final executable.
-# The $(OBJ) are prerequisites, so this rule is only executed after they are built.
-$(TARGET): $(OBJ)
+# Link object files into the final executable
+$(EXEC): $(OBJ)
 	$(CC) $(OBJ) -o $@
 
-# Rule to compile each source file into an object file.
-# The $< is an automatic variable that represents the first prerequisite (the .c file).
-# The $@ is an automatic variable that represents the target (the .o file).
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+# Compile source files into object files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Rule to clean up the build directory.
-# `rm -f` removes the specified files without prompting for confirmation.
-clean:
-	rm -f $(TARGET) $(OBJ)
+# Ensure build directory exists
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-run:
-	./$(TARGET)
+# Clean build artifacts
+clean:
+	rm -rf $(BUILD_DIR)
+
+# Run the program
+run: $(EXEC)
+	./$(EXEC)

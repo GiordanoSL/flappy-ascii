@@ -1,0 +1,11 @@
+# Build directory and compiled files
+/build/
+*.o
+*.out
+*.exe
+
+# Logs or temporary files
+*.log
+*.tmp
+
+high_score.bin
