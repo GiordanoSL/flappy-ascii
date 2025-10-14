@@ -25,7 +25,7 @@ GameState current;
 
 Bird * flappy;
 
-int score;
+static int score, high_score;
 
 void menu_key_handler(char c);
 void game_key_handler(char c);
@@ -43,6 +43,13 @@ int game_init(){
     pipe_create();
 
     score = 0;
+
+    FILE * f = fopen("high_score.bin", "rb");
+    if (f != NULL){
+        fread(&high_score, sizeof(int), 1, f);
+        fclose(f);
+    } else high_score = 0;
+    
 
     return 0;
 }
@@ -95,15 +102,29 @@ void draw_score(int SCORE_X_POS, int SCORE_Y_POS){
     // Drawing first digit
     for (int i = 0; i < 3; i++){
         for (int j = 0; j < 3; j++){
-            set_pixel(SCORE_X_POS + j, SCORE_Y_POS + i, numbers[first_digit][i][j], CINZA, CLEAR);
+            set_pixel(SCORE_X_POS + j, SCORE_Y_POS + i, numbers[first_digit][i][j], BRANCO, CLEAR);
         }
     }
     // Drawing second digit
     for (int i = 0; i < 3; i++){
         for (int j = 0; j < 3; j++){
-            set_pixel(SCORE_X_POS + j + 3, SCORE_Y_POS + i, numbers[second_digit][i][j], CINZA, CLEAR);
+            set_pixel(SCORE_X_POS + j + 3, SCORE_Y_POS + i, numbers[second_digit][i][j], BRANCO, CLEAR);
         }
     }
+    update_screen();
+}
+
+void draw_high_score(int SCORE_X_POS, int SCORE_Y_POS){
+    int first_digit  = high_score / 10;
+    int second_digit = high_score % 10;
+
+    draw_text_center(" HS:     ", 8, SCORE_Y_POS, BRANCO, PRETO);
+    // Drawing first digit
+    set_pixel(SCORE_X_POS + 2, SCORE_Y_POS, '0' + first_digit, BRANCO, PRETO);
+        
+    // Drawing second digit
+    set_pixel(SCORE_X_POS + 3, SCORE_Y_POS, '0' + second_digit, BRANCO, PRETO);
+
     update_screen();
 }
 
@@ -113,9 +134,10 @@ void draw_over(){
     bird_draw(flappy);
     draw_rect(SCR_WIDTH/2 - 6, SCR_HEIGHT/2 - 9, 12, 3, ' ', VERMELHO, PRETO, true);
     draw_text_center("GAME  OVER", 10, SCR_HEIGHT/2 - 8, VERMELHO, PRETO);
-    draw_text_center("FINAL SCORE:", 12, SCR_HEIGHT/2 - 3, CINZA, PRETO);
+    draw_text_center("FINAL SCORE:", 12, SCR_HEIGHT/2 - 3, BRANCO, PRETO);
     draw_rect(SCR_WIDTH/2 - 6, SCR_HEIGHT/2 - 2, 12, 4, ' ', AMARELO, PRETO, true);
     draw_score(SCR_WIDTH/2 - 3, SCR_HEIGHT/2 - 2);
+    draw_high_score(SCR_WIDTH/2 - 1, SCR_HEIGHT/2 + 2);
     draw_text_center("PRESS ESC TO EXIT GAME", 22, SCR_HEIGHT/2 + 5, CINZA, BRANCO);
     draw_text_center("PRESS 'R' TO RESTART", 20, SCR_HEIGHT/2 + 7, CINZA, BRANCO);
     printscr();
@@ -130,6 +152,7 @@ void draw_win(){
     draw_text_center("FINAL SCORE:", 12, SCR_HEIGHT/2 - 3, CINZA, PRETO);
     draw_rect(SCR_WIDTH/2 - 6, SCR_HEIGHT/2 - 2, 12, 4, ' ', AMARELO, PRETO, true);
     draw_score(SCR_WIDTH/2 - 3, SCR_HEIGHT/2 - 2);
+    draw_high_score(SCR_WIDTH/2 - 1, SCR_HEIGHT/2 + 2);
     draw_text_center("PRESS ESC TO EXIT GAME", 22, SCR_HEIGHT/2 + 5, CINZA, BRANCO);
     draw_text_center("PRESS 'R' TO RESTART", 20, SCR_HEIGHT/2 + 7, CINZA, BRANCO);
     printscr();
@@ -208,10 +231,14 @@ void game_run(){
         case GAME_PAUSED:
             break;
         case GAME_OVER:
+            if (score > high_score)
+                high_score = score;            
             sleep(1);
             draw_over();
             break;
         case GAME_WIN:
+            if (score > high_score)
+                high_score = score;      
             sleep(1);
             draw_win();
         case GAME_EXIT:
@@ -229,6 +256,12 @@ void game_run(){
     screen_delete();
     bird_destroy(&flappy);
     pipes_destroy();
+
+    FILE * f = fopen("high_score.bin", "wb");
+    if (f != NULL){
+        fwrite(&high_score, sizeof(int), 1, f);
+        fclose(f);
+    } else printf("Error: High Score saving Failed\n");
 }
 
 void menu_key_handler(char c){
