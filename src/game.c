@@ -46,7 +46,9 @@ int game_init(){
 
     FILE * f = fopen("high_score.bin", "rb");
     if (f != NULL){
-        fread(&high_score, sizeof(int), 1, f);
+        if(fread(&high_score, sizeof(int), 1, f) != 1){
+            high_score = 0; // failed to read properly
+        }
         fclose(f);
     } else high_score = 0;
     
