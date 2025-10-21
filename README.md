@@ -18,7 +18,7 @@ Flappy-ASCII is a **terminal-based clone of Flappy Bird** written in **C**, made
 
   
 ## 🎨 Demo
-Here’s a simple idea of how it looks when running:
+Here’s a simple demo of how it looks when running:
 ![Terminal Flappy Bird Demo](assets/demo.gif)
 
 ## 🧰 Requirements
