@@ -48,7 +48,7 @@ make run
 ```
 Or manually using:
 ```
-./build/flappy-ascii
+./build/flappy_bird
 ```
 **Controls:**  
 - Press **Space** to make the bird jump  
